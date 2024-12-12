@@ -246,10 +246,12 @@ const StoreOffers = ({
         <hr />
         <Image className="" src={image} alt={store?.name} />
         <p className="text-black py-5">{store?.description}</p>
-        <p className="pb-5 flex items-center ">
-          <LuMapPin className="mr-2" />
-          <span className="font-bold">Dirección:</span>
-          {store?.direction}
+        <p className="flex gap-3 items-start py-5">
+          <LuMapPin size={20} className="" />
+          <span>
+            <span className="font-bold">Dirección: </span>
+            {store?.direction}
+          </span>
         </p>
         <hr />
         <Collapse defaultActiveKey={["1"]} ghost items={offers} />
