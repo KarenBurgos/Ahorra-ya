@@ -111,15 +111,20 @@ const Stores = () => {
         </div>
         <Content className="flex flex-col gap-4 p-8">
           <div className="flex items-center gap-4">
-            <Input
-              placeholder="Ingrese un parámetro de búsqueda"
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Select
-              placeholder="Filtrar por"
-              onChange={handleChangeFilter}
-              options={items}
-            />
+            <span className="md:flex w-full gap-4">
+              <Input
+                placeholder="Ingrese un parámetro de búsqueda"
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full"
+              />
+              <Select
+                placeholder="Filtrar por"
+                onChange={handleChangeFilter}
+                options={items}
+                className="w-full md:w-1/6"
+              />
+            </span>
+            
             <button
               className="rounded-full dark:from-gray-800 dark:to-gray-800 bg-gradient-to-br from-orange to-pink text-white p-2 shadow-md"
               onClick={onSearch}

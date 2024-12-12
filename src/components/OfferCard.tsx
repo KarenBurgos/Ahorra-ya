@@ -36,25 +36,37 @@ const OfferCard = ({
     <Card
       id={id}
       style={{
-        width: 230,
-        height: 325,
+        width: 250,
       }}
       className="shadow-md flex flex-col justify-between"
       cover={
-        <img
-          className="object-scale-down h-48 w-24"
-          alt={productName}
-          src={image}
-        />
+        <div
+          style={{
+            width: "100%",
+            height: "300px",
+            overflow: "hidden",
+          }}
+        >
+          <img
+            className="w-full h-full object-cover"
+            alt={productName}
+            src={
+              image ||
+              "https://imagestores.de/cdn/shop/files/AEB7DC72-31F5-4A67-A7D5-24A51D3AC1C1.jpg?v=1720447652&width=1240"
+            }
+          />
+        </div>
       }
     >
-      <p className="text-lg ">{productName}</p>
-      <p className="-mt-2 font-thin">{storeName}</p>
-      <div className="flex justify-between pt-2">
-        <p className="font-bold text-lg text-red-600">${actualPrice}</p>
-        <p className="font-bold text-lg line-through">${previousPrice}</p>
-      </div>
-      <p className="text-sm font-thin text-center">Válido hasta: {endDate}</p>
+      <span className="py-2">
+        <p className="text-lg font-semibold">{productName}</p>
+        <p className="opacity-80">{storeName}</p>
+        <div className="flex py-2 justify-between">
+          <p className="font-bold text-lg text-red-600">${actualPrice}</p>
+          <p className="font-bold text-lg line-through pr-5">${previousPrice}</p>
+        </div>
+        <p className="text-sm opacity-70">Válido hasta: {endDate}</p>
+      </span>
     </Card>
   );
 };
