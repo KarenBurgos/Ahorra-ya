@@ -1,7 +1,6 @@
 import "leaflet/dist/leaflet.css";
 import "../assets/style/AntDesignCustom.css";
-import { Input, Layout } from "antd";
-import SideMenu from "../components/Menu";
+import { Input } from "antd";
 import {
   MapContainer,
   Marker,
@@ -21,26 +20,30 @@ import { getAllStoresService } from "../api/stores";
 import StoreOffers from "../components/StoreOffers";
 import { FaSearch } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
+import { useMenu } from "../context/MenuContext";
+import AppLayout from "../components/AppLayout";
 
-//Selected location icon
+// Selected location icon
 const icon = new Icon({
   iconUrl: OrangePin,
   iconSize: [30, 41],
 });
 
-//Store icon
+// Store icon
 const storeIcon = new Icon({
   iconUrl: BluePin,
   iconSize: [30, 41],
 });
 
-//Select spot in map to add store
-function AddStore({ setOpen, position, setPosition }) {
+// Select spot in map to add store
+function AddStore({ setOpen, position, setPosition, setSelectedPosition }) {
   useMapEvents({
     click(e) {
       setPosition(e.latlng);
+      setSelectedPosition(e.latlng);
     },
   });
+
   return position === null ? null : (
     <Marker position={position} icon={icon}>
       <Popup>
@@ -71,45 +74,43 @@ const Map = () => {
 
   const [position, setPosition] = useState([13.7035233, -89.2116845]);
   const [openStoreForm, setOpenStoreForm] = useState(false);
-  const [selectedPosition, setSelectedPosition] = useState(position);
+  const [selectedPosition, setSelectedPosition] = useState(null);
   const [stores, setStores] = useState([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedStore, setSelectedStore] = useState(null);
   const [address, setAddress] = useState("");
   const [zoom, setZoom] = useState(13);
-
   const [updateStores, setUpdateStores] = useState(false);
+
+  const { menuOpen } = useMenu();
 
   const handleGetAllStores = async () => {
     try {
       const data = await getAllStoresService(token);
       setStores(data);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching stores:", error);
+    }
   };
 
   useEffect(() => {
-    if (stores) {
-      handleGetAllStores();
-      setUpdateStores(false);
-    }
-    // eslint-disable-next-line
+    handleGetAllStores();
   }, [updateStores]);
 
-  //Get store location from url or user location
+  // Get store location from URL or user location
   useEffect(() => {
     if (state?.location) {
       const [lat, lng] = state.location.split(",");
-      setPosition([lat, lng]);
+      setPosition([parseFloat(lat), parseFloat(lng)]);
       setZoom(16);
     } else {
       navigator.geolocation.getCurrentPosition((position) => {
         setPosition([position.coords.latitude, position.coords.longitude]);
       });
     }
-    // eslint-disable-next-line
   }, []);
 
-  //Select store and open drawer
+  // Select store and open drawer
   const handleMarkerClick = (store) => {
     setSelectedStore(store);
     setDrawerVisible(true);
@@ -120,73 +121,71 @@ const Map = () => {
     setSelectedStore(null);
   };
 
-  //Search address in map
+  // Search address in map
   const onSearch = async () => {
     const result = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${address}&format=json&limit=1`
     );
     const data = await result.json();
     if (data.length > 0) {
-      setPosition([data[0].lat, data[0].lon]);
+      setPosition([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
       setZoom(16);
     }
   };
 
   return (
-    <Layout className="min-h-screen flex flex-row text-bg-dark-blue dark:text-white">
-      <ToastContainer />
-      <AddStoreForm
-        open={openStoreForm}
-        setOpen={setOpenStoreForm}
-        handleUpdateStores={setUpdateStores}
-        latitude={selectedPosition.lat}
-        longitude={selectedPosition.lng}
-      />
-      <SideMenu />
-      <Layout className="ml-52">
-        <MapContainer center={position} zoom={zoom} style={{ height: "100vh" }}>
-          <div className="absolute z-[500] mt-5 ml-20 w-10/12 flex gap-4">
-            <Input
-              placeholder="Ingrese una dirección"
-              onChange={(e) => setAddress(e.target.value)}
-            />
-            <button
-              className="rounded-lg dark:from-gray-800 dark:to-gray-800 bg-gradient-to-br from-orange to-pink text-white p-2 shadow-md"
-              onClick={onSearch}
-            >
-              <FaSearch size={20} />
-            </button>
-          </div>
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    <AppLayout>
+      {selectedPosition && (
+        <AddStoreForm
+          open={openStoreForm}
+          setOpen={setOpenStoreForm}
+          handleUpdateStores={handleGetAllStores}
+          latitude={selectedPosition.lat}
+          longitude={selectedPosition.lng}
+        />
+      )}
+      <MapContainer center={position} zoom={zoom} className="h-screen w-full">
+        <div className="absolute z-[500] mt-5 ml-20 w-10/12 flex gap-4">
+          <Input
+            placeholder="Ingrese una dirección"
+            onChange={(e) => setAddress(e.target.value)}
           />
-          <MapComponent position={position} zoom={zoom} />
-          <AddStore
-            setOpen={setOpenStoreForm}
-            setPosition={setSelectedPosition}
-            position={selectedPosition}
+          <button
+            className="rounded-lg dark:from-gray-800 dark:to-gray-800 bg-gradient-to-br from-orange to-pink text-white p-2 shadow-md"
+            onClick={onSearch}
+          >
+            <FaSearch size={20} />
+          </button>
+        </div>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {stores.map((store) => (
+          <Marker
+            key={store.storeId}
+            position={[store.latitude, store.longuitude]}
+            icon={storeIcon}
+            eventHandlers={{
+              click: () => handleMarkerClick(store),
+            }}
           />
-          {stores.map((store) => (
-            <Marker
-              key={store.storeId}
-              position={[store.latitude, store.longuitude]}
-              icon={storeIcon}
-              eventHandlers={{
-                click: () => handleMarkerClick(store),
-              }}
-            />
-          ))}
-          <StoreOffers
-            visible={drawerVisible}
-            onClose={closeDrawer}
-            store={selectedStore}
-            handleUpdateStores={setUpdateStores}
-            showMapButton={false}
-          />
-        </MapContainer>
-      </Layout>
-    </Layout>
+        ))}
+        <AddStore
+          setOpen={setOpenStoreForm}
+          position={selectedPosition}
+          setPosition={setPosition}
+          setSelectedPosition={setSelectedPosition}
+        />
+        <StoreOffers
+          visible={drawerVisible}
+          onClose={closeDrawer}
+          store={selectedStore}
+          handleUpdateStores={handleGetAllStores}
+          showMapButton={false}
+        />
+      </MapContainer>
+    </AppLayout>
   );
 };
 

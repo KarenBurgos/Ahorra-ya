@@ -6,6 +6,7 @@ import { Content } from "antd/es/layout/layout";
 import OfferCard from "../components/OfferCard";
 import { getOfferAll, getOffersByName } from "../api/offer";
 import { FaSearch } from "react-icons/fa";
+import AppLayout from "../components/AppLayout";
 
 const Offers = () => {
   const token = localStorage.getItem("token");
@@ -33,9 +34,7 @@ const Offers = () => {
   }, []);
 
   return (
-    <Layout className="min-h-screen flex flex-row text-bg-dark-blue dark:text-white">
-      <SideMenu />
-      <Layout className="ml-52">
+    <AppLayout>
         <div className="bg-white dark:bg-gray-800 p-6">
           <p className="text-xl">Ofertas</p>
         </div>
@@ -72,8 +71,7 @@ const Offers = () => {
             )).reverse()}
           </div>
         </Content>
-      </Layout>
-    </Layout>
+        </AppLayout>
   );
 };
 export default Offers;

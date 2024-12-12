@@ -101,8 +101,8 @@ const AddStoreForm = ({
         className="flex flex-col gap-3"
         layout="vertical"
       >
-        <div className="flex justify-between gap-8">
-          <div className="w-1/2">
+        <div className="flex flex-col md:flex-row justify-between gap-8">
+          <div className="md:w-1/2">
             <Form.Item
               label="Nombre"
               name="name"
@@ -183,7 +183,7 @@ const AddStoreForm = ({
               <Input.TextArea autoSize={{ minRows: 3, maxRows: 5 }} />
             </Form.Item>
           </div>
-          <div className="w-1/2">
+          <div className="md:w-1/2">
             <Form.Item label="Nombre del contacto" name="ownerName">
               <Input
                 type="text"

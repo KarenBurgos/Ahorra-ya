@@ -6,6 +6,7 @@ import { getAllFavoritesService } from "../api/favorites";
 import { Store } from "../interfaces/Stores";
 import StoreCard from "../components/StoreCard";
 import StoreOffers from "../components/StoreOffers";
+import AppLayout from "../components/AppLayout";
 
 const Favorites = () => {
   const token = localStorage.getItem("token");
@@ -13,7 +14,7 @@ const Favorites = () => {
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedStore, setSelectedStore] = useState(null);
-  
+
   const [updateStores, setUpdateStores] = useState(false);
 
   //Set selected store and open drawer
@@ -31,7 +32,7 @@ const Favorites = () => {
     try {
       const response = await getAllFavoritesService(token);
       setStores(response);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   useEffect(() => {
@@ -41,36 +42,30 @@ const Favorites = () => {
   }, [updateStores]);
 
   return (
-    <Layout className="min-h-screen flex flex-row text-bg-dark-blue dark:text-white">
-      <SideMenu />
-      <Layout className="ml-52">
-        <div className="bg-white dark:bg-gray-800 p-6">
-          <p className="text-xl">Tiendas favoritas</p>
-        </div>
-        <Content className="flex gap-8 p-8 flex-wrap">
-          {stores.map((store) => (
-            <div onClick={() => handleMarkerClick(store)}>
-              <StoreCard
-                key={store.idStore}
-                id={store.idStore}
-                name={store.name}
-                description={store.description}
-                department={store.departament}
-                municipality={store.municipality}
-                address={store.direction}
-              />
-            </div>
-          ))}
-        </Content>
-        <StoreOffers
-          visible={drawerVisible}
-          onClose={closeDrawer}
-          store={selectedStore}
-          handleUpdateStores={setUpdateStores}
-          showMapButton={true}
-        />
-      </Layout>
-    </Layout>
+    <AppLayout>
+      <div className="bg-white dark:bg-gray-800 p-6">
+        <p className="text-xl">Tiendas favoritas</p>
+      </div>
+      <Content className="flex gap-8 p-8 flex-wrap">
+        {stores.map((store) => (
+          <div onClick={() => handleMarkerClick(store)}>
+            <StoreCard
+              id={store.idStore}
+              name={store.name}
+              departament={store.departament.name || "Sin Departamento"} // Cambiar "department" a "departament"
+              municipality={store.municipality.name || "Sin Municipio"} // Validación adicional
+            />
+          </div>
+        ))}
+      </Content>
+      <StoreOffers
+        visible={drawerVisible}
+        onClose={closeDrawer}
+        store={selectedStore}
+        handleUpdateStores={setUpdateStores}
+        showMapButton={true}
+      />
+    </AppLayout>
   );
 };
 export default Favorites;

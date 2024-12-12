@@ -6,8 +6,11 @@ import { LoginFormData } from "../interfaces/LoginFormData";
 import { useGoogleLogin } from "@react-oauth/google";
 import { getUserByEmail, login, loginWithGoogle } from "../api/auth";
 import { ToastContainer } from "react-toastify";
+import { LuLoader } from "react-icons/lu";
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
@@ -26,37 +29,45 @@ const Login = () => {
   //Login with email and password
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const token = await login(formData);
       localStorage.setItem("token", token);
       localStorage.setItem("email", formData.email);
+      setLoading(false);
       navigate("/map");
     } catch (error) {
+      setLoading(false);
     }
   };
 
   //Login with Google
   const loginGoogle = useGoogleLogin({
     onSuccess: async (accessToken) => {
-      //Get user data from Google account
-      const userData = await fetch(
-        "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken.access_token}`,
-          },
-        }
-      ).then((res) => res.json());
+      setLoading(true); // Empieza a cargar al iniciar sesión con Google
+      try {
+        // Obtener los datos del usuario desde la cuenta de Google
+        const userData = await fetch(
+          "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken.access_token}`,
+            },
+          }
+        ).then((res) => res.json());
 
-      const user = await getUserByEmail(userData.email);
-      //If user exists, login with Google. If not, redirect to sign in page
-      if (user) {
-        const token = await loginWithGoogle({ email: userData.email });
-        localStorage.setItem("token", token);
-        localStorage.setItem("email", userData.email);
-        navigate("/map");
-      } else {
-        navigate("/signin", { state: { email: userData.email } });
+        const user = await getUserByEmail(userData.email);
+        // Si el usuario existe, inicia sesión con Google. Si no, redirige a la página de inicio de sesión
+        if (user) {
+          const token = await loginWithGoogle({ email: userData.email });
+          localStorage.setItem("token", token);
+          localStorage.setItem("email", userData.email);
+          navigate("/map");
+        } else {
+          navigate("/signin", { state: { email: userData.email } });
+        }
+      } catch (error) {
+        setLoading(false); // En caso de error
       }
     },
   });
@@ -66,17 +77,17 @@ const Login = () => {
       <ToastContainer />
       <form
         onSubmit={handleSubmit}
-        className="absolute bg-white w-[70vw] h-[70%] grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden text-white z-20 shadow-[-12px_12px_11px_0px_#F9546B]"
+        className="absolute bg-white w-[80vw] md:w-[70vw] h-[70%] grid grid-cols-1 md:grid-cols-2 rounded-2xl p-5overflow-hidden text-white z-20 shadow-form"
       >
         <div className="flex justify-center items-center">
           <img src={logo} alt="logo" className="w-2/4" />
         </div>
         <div className="flex flex-col justify-evenly items-center bg-[#F9546B] rounded-2xl">
-          <div>
-            <h1 className="text-3xl">Inicio de sesión</h1>
-            <h2 className="text-center">¡Bienvenido!</h2>
+          <div className="py-5 md:py-0">
+            <h1 className="text-2xl md:text-3xl">Inicio de sesión</h1>
+            <h2 className="text-sm md:text-base text-center">¡Bienvenido!</h2>
           </div>
-          <div className="w-3/5">
+          <div className="w-4/5 md:w-3/5">
             <p>Correo</p>
             <input
               type="text"
@@ -94,7 +105,7 @@ const Login = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="w-3/5 flex flex-col">
+          <div className="w-4/5 md:w-3/5 flex flex-col">
             <button type="submit" className="bg-[#ff8c96] py-3 rounded-lg ">
               Iniciar Sesión
             </button>
@@ -104,13 +115,14 @@ const Login = () => {
               <span className="h-[1px] w-full bg-white" />
             </span>
             <button
-              className="bg-white text-black p-3 rounded-lg relative"
+              className="flex flex-row justify-center items-center gap-2 bg-white text-black p-3 rounded-lg relative md:mb-0 mb-10"
+              type="button"
               onClick={(e) => {
                 e.preventDefault();
                 loginGoogle();
               }}
             >
-              <span className="absolute z-10 left-3">
+              <span className=" z-10 left-3 ">
                 <FcGoogle size={25} />
               </span>
               Iniciar sesión con Google
@@ -118,6 +130,14 @@ const Login = () => {
           </div>
         </div>
       </form>
+
+      {loading && (
+        <div className="absolute top-0 left-0 w-full h-full flex justify-center gap-4 items-center bg-black bg-opacity-50 z-30">
+          <p className="text-white text-2xl">Cargando</p>
+          <LuLoader className="text-white size-10 animate-spin-slow"/>
+        </div>
+      )}
+
       <span className="rounded-full size-[30vw] bg-white opacity-25 absolute -bottom-[20%] -left-20 z-10"></span>
       <span className="rounded-full size-[30vw] bg-white opacity-25 absolute -top-[30%] -right-40 z-10"></span>
       <span className="rounded-full size-[20vw] bg-white opacity-25 absolute top-[10%] -right-40 z-10"></span>

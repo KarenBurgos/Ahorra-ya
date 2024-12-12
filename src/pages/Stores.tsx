@@ -12,6 +12,8 @@ import { Store } from "../interfaces/Stores";
 import StoreCard from "../components/StoreCard";
 import { FaSearch } from "react-icons/fa";
 import StoreOffers from "../components/StoreOffers";
+import AppLayout from "../components/AppLayout";
+import { Department } from '../interfaces/Departments';
 
 const items = [
   {
@@ -39,7 +41,6 @@ const Stores = () => {
   
   const [updateStores, setUpdateStores] = useState(false);
 
-  //Select store and open drawer
   const handleMarkerClick = (store: any) => {
     setSelectedStore(store);
     setDrawerVisible(true);
@@ -53,16 +54,17 @@ const Stores = () => {
   const handleGetAllStores = async () => {
     try {
       const response = await getAllStoresService(token);
+      console.log(response[0].departament);
       setStores(response);
-    } catch (error) {}
-  };
+    } catch (error) {
+      console.error(error);
+    }
+  };  
 
-  //Change filter type by name, department or municipality
   const handleChangeFilter = (key: string) => {
     setFilter(key);
   };
 
-  //Search by name, department or municipality
   const onSearch = async () => {
     if (search === "") {
       return;
@@ -100,13 +102,10 @@ const Stores = () => {
   useEffect(() => {
     handleGetAllStores();
     setUpdateStores(false);
-    // eslint-disable-next-line
   }, [updateStores]);
 
   return (
-    <Layout className="min-h-screen flex flex-row text-bg-dark-blue dark:text-white">
-      <SideMenu />
-      <Layout className="ml-52">
+    <AppLayout>
         <div className="bg-white dark:bg-gray-800 p-6">
           <p className="text-xl">Tiendas</p>
         </div>
@@ -135,20 +134,18 @@ const Stores = () => {
             Limpiar filtros
           </button>
           <div className="flex gap-5 flex-wrap">
-            {stores.map((store) => (
-              <div onClick={() => handleMarkerClick(store)}>
-                <StoreCard
-                  key={store.idStore}
-                  id={store.idStore}
-                  name={store.name}
-                  description={store.description}
-                  department={store.departament}
-                  municipality={store.municipality}
-                  address={store.direction}
-                />
-              </div>
-            ))}
-          </div>
+  {stores.map((store) => (
+    <div onClick={() => handleMarkerClick(store)} key={store.idStore}>
+      <StoreCard
+        id={store.idStore}
+        name={store.name}
+        departament={store.departament.name || "Sin Departamento"} // Cambiar "department" a "departament"
+        municipality={store.municipality.name || "Sin Municipio"} // Validación adicional
+      />
+    </div>
+  ))}
+</div>
+
         </Content>
         <StoreOffers
           visible={drawerVisible}
@@ -157,8 +154,7 @@ const Stores = () => {
           handleUpdateStores={setUpdateStores}
           showMapButton={true}
         />
-      </Layout>
-    </Layout>
+    </AppLayout>
   );
 };
 

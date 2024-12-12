@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "antd";
 import { getOfferImage } from "../api/images";
+
+interface OfferCardProps {
+  id:string,
+  productName: string,
+  storeName:string,
+  actualPrice: number,
+  previousPrice: number,
+  endDate: string
+}
+
 const OfferCard = ({
   id,
   productName,
@@ -8,7 +18,7 @@ const OfferCard = ({
   actualPrice,
   previousPrice,
   endDate,
-}) => {
+}:OfferCardProps) => {
   const token = localStorage.getItem("token");
   const [image, setImage] = useState();
 
