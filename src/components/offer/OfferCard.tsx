@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "antd";
-import { getOfferImage } from "../api/images";
+import { getOfferImage } from "../../api/images";
 
 interface OfferCardProps {
   id:string,
@@ -52,7 +52,7 @@ const OfferCard = ({
             alt={productName}
             src={
               image ||
-              "https://imagestores.de/cdn/shop/files/AEB7DC72-31F5-4A67-A7D5-24A51D3AC1C1.jpg?v=1720447652&width=1240"
+              "https://lh5.googleusercontent.com/proxy/6GqkEKacZBl4xmcSgeJZ_EzDbh4LBdv7J5u1A1HdbAXbU8jrYJHTvk6zyHmHxdA53BphWLT3HLFg0_N3gAwkEbMVF1iIEUZzd3Bs_eM3ACXDwMokenhEQHTLTUL3a7BB_f5JH3oKywsYXbu37KrJ"
             }
           />
         </div>

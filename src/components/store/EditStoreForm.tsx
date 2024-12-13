@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Store } from "../interfaces/Stores";
+import { Store } from "../../interfaces/Stores";
 import { Button, Form, Input, Modal, Select, Upload } from "antd";
 import { IoIosLink } from "react-icons/io";
 import { FiPhone, FiUser } from "react-icons/fi";
 import { BsUpload } from "react-icons/bs";
 import { AiOutlineMail } from "react-icons/ai";
-import { getAllDepartmentsService } from "../api/departments";
-import { getAllMunicipalitiesService } from "../api/municipalities";
-import { Department } from "../interfaces/Departments";
-import { Municipality } from "../interfaces/Municipalities";
-import { updateStoreService } from "../api/stores";
-import { getInfoStoreImage, updateImageService } from "../api/images";
+import { getAllDepartmentsService } from "../../api/departments";
+import { getAllMunicipalitiesService } from "../../api/municipalities";
+import { Department } from "../../interfaces/Departments";
+import { Municipality } from "../../interfaces/Municipalities";
+import { updateStoreService } from "../../api/stores";
+import { getInfoStoreImage, updateImageService } from "../../api/images";
 
 type EditStoreFormProps = {
     open: boolean;

@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "antd";
-import "../assets/style/AntDesignCustom.css";
-import { getOfferImage } from "../api/images";
-import { deleteOffer } from "../api/offer";
+import "../../assets/style/AntDesignCustom.css";
+import { getOfferImage } from "../../api/images";
+import { deleteOffer } from "../../api/offer";
 import { Popover, Space, Modal } from 'antd';
 import { SlOptions } from "react-icons/sl";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 
-import EditOfferForm from "../components/EditOfferForm"
+import EditOfferForm from "../offer/EditOfferForm"
 
 const OfferCardStore = (
   {
@@ -55,8 +55,7 @@ const OfferCardStore = (
       } catch (error) { }
     };
     fetchImage();
-    // eslint-disable-next-line
-  }, [id, updateImage]);
+  }, [id, updateImage, token]);
 
 
   const content = (
@@ -100,7 +99,7 @@ const OfferCardStore = (
           id="id"
           className="h-48 w-24 object-cover rounded-md rounded-e-md"
           alt={productName}
-          src={image}
+          src={image || "https://lh5.googleusercontent.com/proxy/6GqkEKacZBl4xmcSgeJZ_EzDbh4LBdv7J5u1A1HdbAXbU8jrYJHTvk6zyHmHxdA53BphWLT3HLFg0_N3gAwkEbMVF1iIEUZzd3Bs_eM3ACXDwMokenhEQHTLTUL3a7BB_f5JH3oKywsYXbu37KrJ"}
         />
       }
     >

@@ -18,7 +18,6 @@ const getUserByEmail = (email) => {
 };
 
 const signup = (data) => {
-  console.log(data)
   return new Promise((resolve, reject) => {
     axios
       .post(baseURL + "/auth/signup", data)
@@ -27,7 +26,6 @@ const signup = (data) => {
         toast.loading("Usuario creado con éxito, redirigiendo...");
       })
       .catch((error) => {
-        console.log(error)
         toast.error(
           "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial"
         );

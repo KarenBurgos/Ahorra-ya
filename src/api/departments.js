@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const baseURL = "https://ahorra-ya-backend.onrender.com";
+const baseURL = "https://ahorra-ya-backend.onrender.com"
 
 const getAllDepartmentsService = (token) => {
   return new Promise((resolve, reject) => {

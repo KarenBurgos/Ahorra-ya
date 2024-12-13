@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import axios from "axios";
 
-const baseURL = "https://ahorra-ya-backend.onrender.com/";
+const baseURL = "https://ahorra-ya-backend.onrender.com/"
 
 const createOfferService = (token, data) => {
   return new Promise((resolve, reject) => {

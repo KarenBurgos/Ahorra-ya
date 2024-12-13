@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { Layout } from "antd";
-import SideMenu from "../components/Menu";
 import { Content } from "antd/es/layout/layout";
 import { getAllFavoritesService } from "../api/favorites";
 import { Store } from "../interfaces/Stores";
-import StoreCard from "../components/StoreCard";
-import StoreOffers from "../components/StoreOffers";
+import StoreCard from "../components/store/StoreCard";
+import StoreOffers from "../components/store/StoreOffers";
 import AppLayout from "../components/AppLayout";
 
 const Favorites = () => {
@@ -31,14 +29,21 @@ const Favorites = () => {
   const handleGetAllStores = async () => {
     try {
       const response = await getAllFavoritesService(token);
-      setStores(response);
-    } catch (error) { }
+      console.log(response);
+      if (response) {
+        const filteredResponse = response.filter((store: any) => store !== null);
+        console.log(filteredResponse);
+        setStores(filteredResponse);
+      }
+    } catch (error) {
+      console.error("Error fetching stores:", error);
+    }
   };
+  
 
   useEffect(() => {
     handleGetAllStores();
     setUpdateStores(false);
-    // eslint-disable-next-line
   }, [updateStores]);
 
   return (

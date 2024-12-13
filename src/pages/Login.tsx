@@ -1,4 +1,5 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+// src/pages/Login.tsx
+import { useState, ChangeEvent, FormEvent } from "react";
 import logo from "../assets/img/logo.png";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
@@ -6,18 +7,16 @@ import { LoginFormData } from "../interfaces/LoginFormData";
 import { useGoogleLogin } from "@react-oauth/google";
 import { getUserByEmail, login, loginWithGoogle } from "../api/auth";
 import { ToastContainer } from "react-toastify";
-import { LuLoader } from "react-icons/lu";
+import LoadingScreen from "../components/loadingScreen";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
 
-  //Handle email and password input
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -26,7 +25,6 @@ const Login = () => {
     }));
   };
 
-  //Login with email and password
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -41,12 +39,10 @@ const Login = () => {
     }
   };
 
-  //Login with Google
   const loginGoogle = useGoogleLogin({
     onSuccess: async (accessToken) => {
-      setLoading(true); // Empieza a cargar al iniciar sesión con Google
+      setLoading(true); 
       try {
-        // Obtener los datos del usuario desde la cuenta de Google
         const userData = await fetch(
           "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
           {
@@ -57,7 +53,6 @@ const Login = () => {
         ).then((res) => res.json());
 
         const user = await getUserByEmail(userData.email);
-        // Si el usuario existe, inicia sesión con Google. Si no, redirige a la página de inicio de sesión
         if (user) {
           const token = await loginWithGoogle({ email: userData.email });
           localStorage.setItem("token", token);
@@ -67,7 +62,7 @@ const Login = () => {
           navigate("/signin", { state: { email: userData.email } });
         }
       } catch (error) {
-        setLoading(false); // En caso de error
+        setLoading(false); 
       }
     },
   });
@@ -109,7 +104,7 @@ const Login = () => {
             <button type="submit" className="bg-[#ff8c96] py-3 rounded-lg ">
               Iniciar Sesión
             </button>
-            <span className="flex gap-2  justify-center items-center my-4">
+            <span className="flex gap-2 justify-center items-center my-4">
               <span className="h-[1px] w-full bg-white" />
               <p>o</p>
               <span className="h-[1px] w-full bg-white" />
@@ -122,7 +117,7 @@ const Login = () => {
                 loginGoogle();
               }}
             >
-              <span className=" z-10 left-3 ">
+              <span className="z-10 left-3 ">
                 <FcGoogle size={25} />
               </span>
               Iniciar sesión con Google
@@ -131,13 +126,8 @@ const Login = () => {
         </div>
       </form>
 
-      {loading && (
-        <div className="absolute top-0 left-0 w-full h-full flex justify-center gap-4 items-center bg-black bg-opacity-50 z-30">
-          <p className="text-white text-2xl">Cargando</p>
-          <LuLoader className="text-white size-10 animate-spin-slow"/>
-        </div>
-      )}
-
+      {loading && <LoadingScreen />}
+      
       <span className="rounded-full size-[30vw] bg-white opacity-25 absolute -bottom-[20%] -left-20 z-10"></span>
       <span className="rounded-full size-[30vw] bg-white opacity-25 absolute -top-[30%] -right-40 z-10"></span>
       <span className="rounded-full size-[20vw] bg-white opacity-25 absolute top-[10%] -right-40 z-10"></span>

@@ -1,17 +1,34 @@
 import { useEffect, useState } from "react";
-import { Input, Layout } from "antd";
-import SideMenu from "../components/Menu";
+import { Input } from "antd";
 import { Offer } from "../interfaces/Offers";
 import { Content } from "antd/es/layout/layout";
-import OfferCard from "../components/OfferCard";
+import OfferCard from "../components/offer/OfferCard";
 import { getOfferAll, getOffersByName } from "../api/offer";
 import { FaSearch } from "react-icons/fa";
 import AppLayout from "../components/AppLayout";
+import StoreOffers from "../components/store/StoreOffers";
+import useStoresSearch from "../hooks/useStoreSearch";
 
 const Offers = () => {
   const token = localStorage.getItem("token");
   const [recentOffers, setRecentOffers] = useState<Offer[]>([]);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("1");
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [selectedStore, setSelectedStore] = useState(null);
+
+  const { stores, refreshStores } = useStoresSearch({ token, search, filter });
+
+  const handleMarkerClick = (store: any) => {
+    console.log(store)
+    setSelectedStore(store);
+    setDrawerVisible(true);
+  };
+
+  const closeDrawer = () => {
+    setDrawerVisible(false);
+    setSelectedStore(null);
+  };
 
   const handleGetAllOffers = async () => {
     try {
@@ -59,18 +76,27 @@ const Offers = () => {
           </button>
           <div className="flex gap-5 flex-wrap">
             {recentOffers.map((offer) => (
-              <OfferCard
-                key={offer.idOffer}
-                id={offer.idOffer}
-                productName={offer.name}
-                storeName={offer.store.name}
-                actualPrice={offer.priceNow}
-                previousPrice={offer.priceBefore}
-                endDate={offer.endDate}
-              />
+              <div onClick={() => handleMarkerClick(offer.store)} key={offer.store.idStore}>
+                <OfferCard
+                  key={offer.idOffer}
+                  id={offer.idOffer}
+                  productName={offer.name}
+                  storeName={offer.store.name}
+                  actualPrice={offer.priceNow}
+                  previousPrice={offer.priceBefore}
+                  endDate={offer.endDate}
+                />
+                </div>
             )).reverse()}
           </div>
         </Content>
+        <StoreOffers
+        visible={drawerVisible}
+        onClose={closeDrawer}
+        store={selectedStore}
+        handleUpdateStores={refreshStores}
+        showMapButton={true}
+      />
         </AppLayout>
   );
 };

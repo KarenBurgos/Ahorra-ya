@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "antd";
 import { TbMapPinFilled } from "react-icons/tb";
-import { getStoreImage } from "../api/images";
+import { getStoreImage } from "../../api/images";
 
 interface StoreCardProps {
   id: string,
@@ -19,7 +19,6 @@ const StoreCard: React.FC<StoreCardProps> = ({
   const token = localStorage.getItem("token");
   const [image, setImage] = useState();
 
-  console.log(typeof (departament))
   useEffect(() => {
     const fetchImage = async () => {
       try {
@@ -42,7 +41,7 @@ const StoreCard: React.FC<StoreCardProps> = ({
         <div
           style={{
             width: "100%",
-            height: "300px", // Altura fija
+            height: "300px", 
             overflow: "hidden",
           }}
         >
@@ -50,8 +49,7 @@ const StoreCard: React.FC<StoreCardProps> = ({
             className="w-full h-full object-cover"
             alt={name}
             src={
-              image ||
-              "https://imagestores.de/cdn/shop/files/AEB7DC72-31F5-4A67-A7D5-24A51D3AC1C1.jpg?v=1720447652&width=1240" // Imagen por defecto
+              image ||"https://lh5.googleusercontent.com/proxy/6GqkEKacZBl4xmcSgeJZ_EzDbh4LBdv7J5u1A1HdbAXbU8jrYJHTvk6zyHmHxdA53BphWLT3HLFg0_N3gAwkEbMVF1iIEUZzd3Bs_eM3ACXDwMokenhEQHTLTUL3a7BB_f5JH3oKywsYXbu37KrJ"
             }
           />
         </div>

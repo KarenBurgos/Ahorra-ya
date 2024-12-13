@@ -1,4 +1,3 @@
-// components/AppLayout.tsx
 import { Layout } from "antd";
 import SideMenu from "./Menu";
 import { ToastContainer } from "react-toastify";

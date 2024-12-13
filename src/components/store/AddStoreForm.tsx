@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Store } from "../interfaces/Stores";
+import { Store } from "../../interfaces/Stores";
 import { Button, Form, Input, Modal, Select, Upload } from "antd";
 import { IoIosLink } from "react-icons/io";
 import { FiPhone, FiUser } from "react-icons/fi";
 import { BsUpload } from "react-icons/bs";
 import { AiOutlineMail } from "react-icons/ai";
-import { getAllDepartmentsService } from "../api/departments";
-import { getAllMunicipalitiesByDepartmentService } from "../api/municipalities";
-import { Department } from "../interfaces/Departments";
-import { createStoreService } from "../api/stores";
-import { createImageService } from "../api/images";
+import { getAllDepartmentsService } from "../../api/departments";
+import { getAllMunicipalitiesByDepartmentService } from "../../api/municipalities";
+import { Department } from "../../interfaces/Departments";
+import { createStoreService } from "../../api/stores";
+import { createImageService } from "../../api/images";
 
 type AddStoreFormProps = {
   open: boolean;
@@ -55,13 +55,11 @@ const AddStoreForm = ({
 
   useEffect(() => {
     handleGetAllDepartments();
-    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     handleGetAllMunicipalities();
 
-    // eslint-disable-next-line
   }, [selectedDepartment]);
 
   //Filter select options
@@ -71,7 +69,6 @@ const AddStoreForm = ({
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const handleSubmit = async (values: Store) => {
-    //Add selected latitude and longitude
     values.latitude = latitude;
     values.longitude = longitude;
     try {

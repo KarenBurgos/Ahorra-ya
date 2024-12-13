@@ -6,22 +6,20 @@ import {
   Marker,
   Popup,
   TileLayer,
-  useMap,
   useMapEvents,
 } from "react-leaflet";
 import { Icon } from "leaflet";
 import OrangePin from "../assets/OrangePin.png";
 import BluePin from "../assets/BluePin.png";
 import { useState, useEffect } from "react";
-import AddStoreForm from "../components/AddStoreForm";
-import { ToastContainer } from "react-toastify";
+import AddStoreForm from "../components/store/AddStoreForm";
 import "react-toastify/dist/ReactToastify.css";
 import { getAllStoresService } from "../api/stores";
-import StoreOffers from "../components/StoreOffers";
+import StoreOffers from "../components/store/StoreOffers";
 import { FaSearch } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
-import { useMenu } from "../context/MenuContext";
 import AppLayout from "../components/AppLayout";
+import { useTheme } from "../context/ThemeContext";
 
 // Selected location icon
 const icon = new Icon({
@@ -58,16 +56,6 @@ function AddStore({ setOpen, position, setPosition, setSelectedPosition }) {
   );
 }
 
-const MapComponent = ({ position, zoom }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (position) {
-      map.flyTo(position, zoom);
-    }
-  }, [position, map, zoom]);
-  return null;
-};
-
 const Map = () => {
   const state = useLocation().state;
   const token = localStorage.getItem("token");
@@ -81,8 +69,11 @@ const Map = () => {
   const [address, setAddress] = useState("");
   const [zoom, setZoom] = useState(13);
   const [updateStores, setUpdateStores] = useState(false);
+  const { darkMode } = useTheme();
 
-  const { menuOpen } = useMenu();
+  const mapTheme = darkMode
+    ? "https://api.mapbox.com/styles/v1/karenburgos/cm4maqh3p004h01ryh0u15jli/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoia2FyZW5idXJnb3MiLCJhIjoiY2x5dDlib3kzMHBjaTJpb2l5dmYwOGw1YyJ9.YsxdRu6U5wdveO4oSdWZkQ"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
   const handleGetAllStores = async () => {
     try {
@@ -159,7 +150,7 @@ const Map = () => {
         </div>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url={mapTheme}
         />
         {stores.map((store) => (
           <Marker

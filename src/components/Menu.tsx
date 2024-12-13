@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { GrMap } from "react-icons/gr";
 import { IoPricetagOutline } from "react-icons/io5";
 import { MdOutlineStore, MdOutlineLogout, MdLightMode, MdNightlight } from "react-icons/md";
@@ -8,18 +8,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../api/auth";
 import { useMenu } from "../context/MenuContext";
 import { GetUsername } from "../utils/getUsername";
+import { useTheme } from "../context/ThemeContext";
+import { FaRegHeart } from "react-icons/fa6";
 
 const SideMenu: React.FC = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const email = localStorage.getItem("email");
-  const [dark, setDark] = useState(false);
   const { menuOpen, toggleMenu } = useMenu();
-
-  const darkModeHandler = () => {
-    setDark(!dark);
-    document.body.classList.toggle("dark");
-  };
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -28,19 +25,18 @@ const SideMenu: React.FC = () => {
     } catch (error) { }
   };
 
-
   return (
     <div
-    id="menu"
-      className={`${menuOpen ? "w-[13vw] md:w-[5vw]" : "w-[13vw]"
-        } h-full fixed bg-gradient-to-br from-pink to-orange dark:from-gray-800 dark:to-gray-800 text-white transition-all`}
+      id="menu"
+      className={`${menuOpen ? "w-[13vw] md:w-[5vw]" : "w-[13vw]"}
+        h-full fixed bg-gradient-to-br from-pink to-orange dark:from-gray-800 dark:to-gray-800 text-white transition-all`}
     >
       <div className="flex flex-col items-center p-4 gap-2">
         <FaRegCircleUser size={40} color={"#FFFFFF"} />
         {!menuOpen && (
           <>
             <h1>¡Bienvenido/a!</h1>
-            <p>{email && GetUsername({email})}</p>
+            <p>{email && GetUsername({ email })}</p>
           </>
         )}
         <span className="w-full h-[1px] bg-white bg-opacity-50" />
@@ -56,7 +52,7 @@ const SideMenu: React.FC = () => {
           </Link>
           <Link to={"/favorites"}>
             <div className="flex items-center p-4 gap-5 cursor-pointer hover:bg-orange-300 dark:hover:bg-gray-700 hover:text-red-200">
-              <MdOutlineStore className={"#FFFFFF size-6"} />
+              <FaRegHeart className={"#FFFFFF size-6"} />
               {!menuOpen && "Favoritos"}
             </div>
           </Link>
@@ -84,9 +80,9 @@ const SideMenu: React.FC = () => {
           </span>
           <span
             className="flex items-center p-4 gap-5 cursor-pointer hover:bg-pink-400 dark:hover:bg-gray-700"
-            onClick={darkModeHandler}
+            onClick={toggleDarkMode} // Usar la función del contexto
           >
-            {dark ? (
+            {darkMode ? (
               <>
                 <MdLightMode className="text-white size-6" />
                 {!menuOpen && "Modo Claro"}
@@ -112,3 +108,4 @@ const SideMenu: React.FC = () => {
 };
 
 export default SideMenu;
+

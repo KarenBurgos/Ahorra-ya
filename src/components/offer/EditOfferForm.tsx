@@ -1,35 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { Button, DatePicker, Form, Input, Modal, Select, Upload } from "antd";
-import { getAllCategoriesService } from "../api/categories";
-import { Category } from "../interfaces/Categories";
-import { createOfferService } from "../api/offer";
-import { createImageService } from "../api/images";
+import { getAllCategoriesService } from "../../api/categories";
+import { Category } from "../../interfaces/Categories";
+import { updateOffer } from "../../api/offer";
+import { getInfoOfferImage, updateImageService } from "../../api/images";
 import { BsUpload } from "react-icons/bs";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-type AddOfferFormProps = {
+dayjs.extend(customParseFormat);
+
+type EditOfferFormProps = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  idStore: any;
   handleUpdateOffers: React.Dispatch<React.SetStateAction<boolean>>;
-  idStore: string;
+  handleUpdateImage: React.Dispatch<React.SetStateAction<boolean>>;
+  offer: any;
 };
 
-const AddOfferForm = ({
+const EditOfferForm = ({
   open,
   setOpen,
-  handleUpdateOffers,
   idStore,
-}: AddOfferFormProps) => {
+  handleUpdateOffers,
+  handleUpdateImage,
+  offer
+}: EditOfferFormProps) => {
   const token = localStorage.getItem("token");
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [image, setImage] = useState<File | null>(null);
   const [form] = Form.useForm();
 
+
   const handleGetAllCategories = async () => {
     try {
       const data = await getAllCategoriesService(token);
       setCategories(data);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   useEffect(() => {
@@ -44,28 +53,50 @@ const AddOfferForm = ({
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const handleSubmit = async (values: any) => {
-    values.store = idStore;
+    values.idOffer = offer?.id;
     values.active = true;
     values.initDate = values.initDate.format("YYYY-MM-DD");
-    values.endDate = values.priceNow.format("YYYY-MM-DD");
+    values.endDate = values.endDate.format("YYYY-MM-DD");
     values.priceNow = values.priceAfter;
+    //Value of the category selected in the form
+    values.category = values.category; 
+    values.store = idStore;
     delete values.priceAfter;
 
     try {
-      const offerID = await createOfferService(token, values);
+      await updateOffer(token, values);
+
+      const imageId = await getInfoOfferImage(token, offer.id)
+
       if (image) {
-        await createImageService(token, { file: image, offer: offerID });
+        await updateImageService(token, { file: image, idImage: imageId });
+        handleUpdateImage(true);
       }
+
       setOpen(false);
       handleUpdateOffers(true);
       form.resetFields();
       setImage(null);
-    } catch (error) {}
+    } catch (error) { }
   };
+
+  useEffect(() => {
+    if (offer) {
+      form.setFieldsValue({
+        name: offer.name,
+        description: offer.description,
+        priceBefore: offer.priceBefore,
+        priceAfter: offer.priceNow,
+        initDate: dayjs(offer.initDate, "YYYY-MM-DD"),
+        endDate: dayjs(offer.endDate, "YYYY-MM-DD"),
+        category: offer.category.idCategory, //Set initial value of the category
+      });
+    }
+  }, [offer, form]);
 
   return (
     <Modal
-      title="Agregar oferta"
+      title="Editar oferta"
       style={{ top: 5 }}
       open={open}
       closable={false}
@@ -132,7 +163,7 @@ const AddOfferForm = ({
             </Form.Item>
             <Form.Item
               label="Fin de la oferta"
-              name="priceNow"
+              name="endDate"
               className="w-1/2"
               rules={[
                 {
@@ -153,6 +184,7 @@ const AddOfferForm = ({
               placeholder="Seleccione una categoría"
               optionFilterProp="children"
               filterOption={filterOption}
+              defaultValue={offer?.category?.idCategory}
               options={categories.map((category) => ({
                 value: category.idCategory,
                 label: category.name,
@@ -160,16 +192,16 @@ const AddOfferForm = ({
             />
           </Form.Item>
           <Upload
-              beforeUpload={(file) => {
-                setImage(file);
-                return false;
-              }}
-              listType="picture"
-              maxCount={1}
-              accept="image/*"
-            >
-              <Button icon={<BsUpload />}>Agregar imagen</Button>
-            </Upload>
+            beforeUpload={(file) => {
+              setImage(file);
+              return false;
+            }}
+            listType="picture"
+            maxCount={1}
+            accept="image/*"
+          >
+            <Button icon={<BsUpload />}>Agregar imagen</Button>
+          </Upload>
         </div>
         <div className="flex justify-between">
           <button
@@ -183,7 +215,7 @@ const AddOfferForm = ({
             type="submit"
             className="bg-gradient-to-br from-orange to-pink py-2 px-4 text-white rounded-md"
           >
-            Guardar
+            Actualizar
           </button>
         </div>
       </Form>
@@ -191,4 +223,4 @@ const AddOfferForm = ({
   );
 };
 
-export default AddOfferForm;
+export default EditOfferForm;

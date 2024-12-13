@@ -1,24 +1,35 @@
 import { toast } from "react-toastify";
 import axios from "axios";
 
-const baseURL = "https://ahorra-ya-backend.onrender.com/";
+const baseURL = "https://ahorra-ya-backend.onrender.com/"
 
 const createImageService = (token, data) => {
+  const formData = new FormData();
+  formData.append("file", data.file);
+
+  // Agregar dinámicamente "store" u "offer" si están presentes
+  if (data.store) {
+    formData.append("store", data.store);
+  }
+  if (data.offer) {
+    formData.append("offer", data.offer);
+  }
+
   return new Promise((resolve, reject) => {
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
       },
     };
+
     axios
-      .post(baseURL + "image/", data, config)
+      .post(baseURL + "image/", formData, config)
       .then((response) => {
         resolve(response.data.message);
       })
       .catch((error) => {
-        reject(error.response.data.message);
-        toast.error(error.response.data.message);
+        reject(error);
+        toast.error(error.response?.data?.message || "Error al subir la imagen");
       });
   });
 };
